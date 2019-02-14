@@ -1,25 +1,25 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Shop.Web.Data;
-using Shop.Web.Data.Entities;
-
-namespace Shop.Web.Controllers
+﻿namespace Shop.Web.Controllers
 {
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Data.Entities;
+    using Data.Repository;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+
     public class ProductsController : Controller
     {
-        private readonly DataContext _context;
+        private readonly IProductRepository repository;
 
-        public ProductsController(DataContext context)
+        public ProductsController(IProductRepository repository)
         {
-            _context = context;
+            this.repository = repository;
         }
 
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Products.ToListAsync());
+            return View(await this.repository.GetAll().OrderBy(p => p.Name).ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -30,8 +30,7 @@ namespace Shop.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await this.repository.GetById(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -47,16 +46,13 @@ namespace Shop.Web.Controllers
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,ImageUrl,LastPurchase,LastSale,IsAvailabe,Stock")] Product product)
+        public async Task<IActionResult> Create(Product product)
         {
             if (this.ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                await this.repository.Create(product);
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -70,7 +66,7 @@ namespace Shop.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = await this.repository.GetById(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -79,27 +75,19 @@ namespace Shop.Web.Controllers
         }
 
         // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,ImageUrl,LastPurchase,LastSale,IsAvailabe,Stock")] Product product)
+        public async Task<IActionResult> Edit(Product product)
         {
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
-
             if (this.ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    await this.repository.Update(product);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.Id))
+                    if (!await this.repository.Exist(product.Id))
                     {
                         return NotFound();
                     }
@@ -121,8 +109,7 @@ namespace Shop.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var product = await this.repository.GetById(id.Value);
             if (product == null)
             {
                 return NotFound();
@@ -136,15 +123,9 @@ namespace Shop.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            var product = await this.repository.GetById(id);
+            await this.repository.Delete(product);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
         }
     }
 }

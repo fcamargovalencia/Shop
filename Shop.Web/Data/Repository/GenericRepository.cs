@@ -19,32 +19,32 @@
             return this._dbContext.Set<T>().AsNoTracking();
         }
 
-        public async Task<T> GetById(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
             return await this._dbContext.Set<T>()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task Create(T entity)
+        public async Task CreateAsync(T entity)
         {
             await this._dbContext.Set<T>().AddAsync(entity);
             await SaveAllAsync();
         }
 
-        public async Task Update(T entity)
+        public async Task UpdateAsync(T entity)
         {
             this._dbContext.Set<T>().Update(entity);
             await SaveAllAsync();
         }
 
-        public async Task Delete(T entity)
+        public async Task DeleteAsync(T entity)
         {
             this._dbContext.Set<T>().Remove(entity);
             await SaveAllAsync();
         }
 
-        public async Task<bool> Exist(int id)
+        public async Task<bool> ExistAsync(int id)
         {
             return await this._dbContext.Set<T>().AnyAsync(e => e.Id == id);
 

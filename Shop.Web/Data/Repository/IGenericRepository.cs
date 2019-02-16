@@ -9,14 +9,14 @@
 
         IQueryable<T> GetAll();
 
-        Task<T> GetById(int id);
+        Task<T> GetByIdAsync(int id);
 
-        Task Create(T entity);
+        Task CreateAsync(T entity);
 
-        Task Update(T entity);
+        Task UpdateAsync(T entity);
 
-        Task Delete(T entity);
+        Task DeleteAsync(T entity);
 
-        Task<bool> Exist(int id);
+        Task<bool> ExistAsync(int id);
     }
 }

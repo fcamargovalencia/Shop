@@ -1,6 +1,5 @@
 ﻿namespace Shop.Web.Controllers
 {
-    using System;
     using System.IO;
     using System.Linq;
     using System.Threading.Tasks;

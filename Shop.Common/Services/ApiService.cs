@@ -17,7 +17,7 @@
                 {
                     BaseAddress = new Uri(urlBase)
                 };
-                var url = $"/{servicePrefix}/{controller}";
+                var url = $"{servicePrefix}{controller}";
                 var response = await client.GetAsync(url);
                 var result = await response.Content.ReadAsStringAsync();
 

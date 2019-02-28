@@ -10,7 +10,13 @@
     {
         private readonly ApiService apiService;
         private ObservableCollection<Product> products;
+        private bool isRefreshing;
 
+        public bool IsRefreshing
+        {
+            get => this.isRefreshing;
+            set => this.SetValue(ref this.isRefreshing, value);
+        }
 
         public ObservableCollection<Product> Products
         {
@@ -27,10 +33,15 @@
 
         private async void LoadProducts()
         {
+            this.IsRefreshing = true;
+
             var response = await this.apiService.GetListAsync<Product>(
                 "https://shopfc.azurewebsites.net",
                 "/api",
                 "/Products");
+
+            this.IsRefreshing = false;
+
             if (!response.IsSuccess)
             {
                 await Application.Current.MainPage.DisplayAlert(

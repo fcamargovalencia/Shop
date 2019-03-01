@@ -7,10 +7,12 @@
     using Data.Entities;
     using Data.Repository;
     using Helpers;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
     using Models;
 
+    [Authorize]
     public class ProductsController : Controller
     {
         private readonly IProductRepository repository;
@@ -25,7 +27,7 @@
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            return View(await this.repository.GetAll().OrderBy(p => p.Name).ToListAsync());
+            return this.View(await this.repository.GetAll().OrderBy(p => p.Name).ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -33,21 +35,21 @@
         {
             if (id == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
             var product = await this.repository.GetByIdAsync(id.Value);
             if (product == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            return View(product);
+            return this.View(product);
         }
 
         // GET: Products/Create
         public IActionResult Create()
         {
-            return View();
+            return this.View();
         }
 
         // POST: Products/Create
@@ -75,13 +77,13 @@
                     path = $"~/images/Products/{file}";
                 }
 
-                var product = ToProduct(view, path);
+                var product = this.ToProduct(view, path);
                 //TODO: Change for the logged user
                 product.User = await this.userHelper.GetUserByEmailAsync("fabiancv.90@gmail.com");
                 await this.repository.CreateAsync(product);
-                return RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Index));
             }
-            return View(view);
+            return this.View(view);
         }
 
         private Product ToProduct(ProductViewModel view, string path)
@@ -105,16 +107,16 @@
         {
             if (id == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
             var product = await this.repository.GetByIdAsync(id.Value);
             if (product == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
-            var view = ToProductViewModel(product);
-            return View(view);
+            var view = this.ToProductViewModel(product);
+            return this.View(view);
         }
 
         private ProductViewModel ToProductViewModel(Product product)
@@ -160,7 +162,7 @@
                         path = $"~/images/Products/{file}";
                     }
 
-                    var product = ToProduct(view, path);
+                    var product = this.ToProduct(view, path);
                     //TODO: Change for the logged user
                     product.User = await this.userHelper.GetUserByEmailAsync("fabiancv.90@gmail.com");
                     await this.repository.UpdateAsync(product);
@@ -169,16 +171,16 @@
                 {
                     if (!await this.repository.ExistAsync(view.Id))
                     {
-                        return NotFound();
+                        return this.NotFound();
                     }
                     else
                     {
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Index));
             }
-            return View(view);
+            return this.View(view);
         }
 
         // GET: Products/Delete/5
@@ -186,16 +188,16 @@
         {
             if (id == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
             var product = await this.repository.GetByIdAsync(id.Value);
             if (product == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
-            return View(product);
+            return this.View(product);
         }
 
         // POST: Products/Delete/5
@@ -205,7 +207,7 @@
         {
             var product = await this.repository.GetByIdAsync(id);
             await this.repository.DeleteAsync(product);
-            return RedirectToAction(nameof(Index));
+            return this.RedirectToAction(nameof(Index));
         }
     }
 }

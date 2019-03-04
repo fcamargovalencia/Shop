@@ -24,6 +24,9 @@
         {
             await this.context.Database.EnsureCreatedAsync();
 
+            await this.userHelper.CheckRoleAsync("Admin");
+            await this.userHelper.CheckRoleAsync("Customer");
+
             var user = await this.userHelper.GetUserByEmailAsync("fabiancv.90@gmail.com");
             if (user == null)
             {
@@ -41,13 +44,19 @@
                 {
                     throw new InvalidOperationException("Could not create the user in seeder");
                 }
+
+                var isInRole = await this.userHelper.IsInRoleAsync(user, "Admin");
+                if (!isInRole)
+                {
+                    await this.userHelper.AddUserToRoleAsync(user, "Admin");
+                }
             }
 
             if (!this.context.Products.Any())
             {
-                AddProduct("iPhone X", user);
-                AddProduct("Magic Mouse", user);
-                AddProduct("iWatch Series 4", user);
+                this.AddProduct("iPhone X", user);
+                this.AddProduct("Magic Mouse", user);
+                this.AddProduct("iWatch Series 4", user);
                 await this.context.SaveChangesAsync();
             }
         }

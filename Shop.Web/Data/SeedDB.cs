@@ -45,11 +45,13 @@
                     throw new InvalidOperationException("Could not create the user in seeder");
                 }
 
-                var isInRole = await this.userHelper.IsInRoleAsync(user, "Admin");
-                if (!isInRole)
-                {
-                    await this.userHelper.AddUserToRoleAsync(user, "Admin");
-                }
+                await this.userHelper.AddUserToRoleAsync(user, "Admin");
+            }
+
+            var isInRole = await this.userHelper.IsInRoleAsync(user, "Admin");
+            if (!isInRole)
+            {
+                await this.userHelper.AddUserToRoleAsync(user, "Admin");
             }
 
             if (!this.context.Products.Any())

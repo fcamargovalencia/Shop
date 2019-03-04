@@ -1,10 +1,13 @@
 ﻿namespace Shop.Web.Controllers.API
 {
-    using Microsoft.AspNetCore.Mvc;
-    using Data.Repository;
     using System.Linq;
+    using Data.Repository;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[Controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProductsController : Controller
     {
         private readonly IProductRepository productRepository;
@@ -17,7 +20,7 @@
         [HttpGet]
         public IActionResult GetProducts()
         {
-            return Ok(this.productRepository.GetAllWithUsers().OrderBy(p => p.Name));
+            return this.Ok(this.productRepository.GetAllWithUsers().OrderBy(p => p.Name));
         }
     }
 }
